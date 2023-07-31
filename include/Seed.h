@@ -7,6 +7,9 @@
 
 #include <vector>
 #include <utility>
+#include <string> 
+#include <set>
+
 
 class Seed : public AnalysisObject{
 
@@ -29,11 +32,14 @@ class Seed : public AnalysisObject{
 
     void CalculateNoisyPixels();
 
+
+
     // histograms for the position of seeds within the matrix
     TH1F* hSeed_row;
     TH1F* hSeed_col;
     TH2F* hSeed_map;
     TH1F* hSeed_all;
+    
 
     // corresponding canvases
     TCanvas* cSeed_row;

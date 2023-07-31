@@ -2,6 +2,8 @@
 #include "Debug.h"
 #include "CommandLine.h"
 #include "TreeData.h"
+#include "Cluster.h"
+#include<set>
 
 Seed::Seed():
     AnalysisObject(),
@@ -9,8 +11,8 @@ Seed::Seed():
     cSeed_row(nullptr), cSeed_col(nullptr), cSeed_map(nullptr),
     cSeed_all(nullptr),
     hSeed_sector{nullptr}, hRow_sector{nullptr}, hCol_sector{nullptr},
-    cSeed_sector(nullptr), 
-    m_NoiseThreshold(1000) //FIXME: initialized this variable taking the input from command line
+    cSeed_sector(nullptr),
+    m_NoiseThreshold(1000) //FIXME: initialized this variable taking the input from command line 
 {
     DBPRINT("Seed object created: ", this);
 }
@@ -42,7 +44,7 @@ void Seed::Book() {
     for(unsigned int i=0; i < m_Nsectors; ++i){
 
         Save( hSeed_sector[i] = new TH1F ( ("hSeed_sct_" + std::to_string(i)).c_str(), 
-            ("Seed sector # " + std::to_string(i)).c_str(), 100, 0, 9000) );
+            ("Seed sector # " + std::to_string(i)).c_str(), 100, 0, 5000) ); //default 0-9000 ADC
         hSeed_sector[i]->GetXaxis()->SetTitle("Signal [ADC]");
 
         Save( hRow_sector[i] = new TH1F ( ("hRow_sct_" + std::to_string(i)).c_str(),
@@ -57,7 +59,7 @@ void Seed::Book() {
     // creation of canvas for sectors
     Save( CreateCanvasForSector(cSeed_sector, hSeed_sector) ); 
 
-    Save( hSeed_all = new TH1F("hSeed_all", "Seed distribution", 100, 0, 9000) );
+    Save( hSeed_all = new TH1F("hSeed_all", "Seed distribution", 100, 0, 7000) ); //default 0-9000 ADC
     hSeed_all->GetXaxis()->SetTitle("Signal [ADC]");
     Save( CreateCanvas(cSeed_all, hSeed_all) );
     
@@ -102,6 +104,8 @@ void Seed::Analyze(unsigned int iClz, unsigned int iSec){
     // Update noisy pixels.
     CalculateNoisyPixels();
 
+
+
     return;
 }
 
@@ -125,11 +129,17 @@ void Seed::CalculateNoisyPixels(){
 
     return;
 }
+
+
+
 void Seed::End(){
+    
+    TF1 *f = new TF1("f", "gaus", 500, 7000);
+    hSeed_all->Fit(f, "R");
+        
 
     std::cout << "Seed analysis completed. Plotting the results ... \n";
 
-    
 
     m_Already_analyzed = true;
 

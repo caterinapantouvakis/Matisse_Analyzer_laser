@@ -61,7 +61,7 @@ m_RootFile(nullptr)
     m_Parameters.Print();
 
     // set preAnalysis status from command line info: by default do pre analysis
-    bool doPreAnalysis = (bool) m_CommandLine.contains("preAnalysis") ? m_CommandLine.getValue("preAnalysis") : true ;
+    bool doPreAnalysis = (bool) m_CommandLine.contains("preAnalysis") ? m_CommandLine.getValue("preAnalysis") : false ;
     // set the chains and read the trees to get data
     m_TreeHandler = new TreeHandler( m_CommandLine.getFileNameRAW(), doPreAnalysis );
 
@@ -99,7 +99,7 @@ void MatisseAnalyzer::beginAnalysis(){
         else if(word == "noise"){
             m_vAnalysisObj.emplace_back( new Noise() );
         }
-
+        
         else if(word == "all"){
             m_vAnalysisObj.emplace_back( new Seed() );
             m_vAnalysisObj.emplace_back( new Cluster() );
@@ -109,7 +109,7 @@ void MatisseAnalyzer::beginAnalysis(){
         else
             continue;
     }
-
+        // fa tutti i begin delle analisi
     for(auto& obj : m_vAnalysisObj)
         obj->Begin(m_CommandLine);
 
@@ -157,24 +157,25 @@ void MatisseAnalyzer::analyze(){
                 float max_val = dataFloat->Get("clusterh")->at(iClz);
                 float noise_val = dataFloat->Get("noise_nxn")->at(noiseIndex);
 
-                if( max_val/noise_val > seed_thr ){
+                if( max_val/noise_val > seed_thr ){ 
                     // select seeds only in the 2 central columns of each sector
                     // columns 3-4 , 9-10 , 15-16, 21-22
                     unsigned int mod = dataInt->Get("col_seed")->at(iClz)%6;
-                    if( (mod>1) && (mod<4) ){
+                    //if( (mod>1) && (mod<4) ){ // non taglia colonne e no noisy pixels
 
-                        if( std::find(NoisyPixels.begin(), NoisyPixels.end(),
+                        /*if( std::find(NoisyPixels.begin(), NoisyPixels.end(),
                             std::make_pair(dataInt->Get("col_seed")->at(iClz),
                             dataInt->Get("row_seed")->at(iClz))) != NoisyPixels.end() )
                                 continue;
-
+                        */
                             // analyze iClz cluster for iSec sector 
                             obj->Analyze(iClz, iSec);
 
-
+                        /*
                             if(dynamic_cast<Seed*>(obj) != nullptr)
                                 NoisyPixels = (dynamic_cast<Seed*>(obj))->GetNoisyPixels() ;
-                    } 
+                        */
+                    //}
 
                     // if value/noise > seed_thr we have a cluster
                     ++Clz::Count;
