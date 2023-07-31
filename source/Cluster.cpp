@@ -99,8 +99,8 @@ void Cluster::Analyze(unsigned int iClz, unsigned int iSec){
     TreeData<int>* dataInt = TreeData<int>::GetInstance();
     TreeData<float>* dataFloat = TreeData<float>::GetInstance();
 
-    //Clz::Height = 0;
-
+    //Clz::Height = 0; //non serve 
+    
     int row_seed = dataInt->Get("row_seed")->at(iClz);
     int col_seed = dataInt->Get("col_seed")->at(iClz);
     
